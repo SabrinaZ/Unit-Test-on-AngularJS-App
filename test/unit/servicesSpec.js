@@ -1,12 +1,58 @@
 'use strict';
 
+/*global inject*/
+
 describe('service', function() {
 
-  // load modules
-  beforeEach(module('phonecatApp'));
+    // load modules
+    beforeEach(module('phonecatApp'));
 
-  // Test service availability
-  it('check the existence of Phone factory', inject(function(Phone) {
-      expect(Phone).toBeDefined();
+
+    // Test service availability
+    it('check the existence of Phone factory', inject(function(Phone) {
+        expect(Phone).toBeDefined();
     }));
+
+    // Test http get request using $httpBackend
+
+    describe('Test http get request using $httpBackend', function() {
+        var PhoneService, $httpBackend;
+        var url;
+
+        beforeEach(inject(function(_$httpBackend_, _Phone_) {
+            $httpBackend = _$httpBackend_;
+            PhoneService = _Phone_;
+            url = 'phones/phones.json';
+
+        }));
+
+        //verify that after all test suites are excuted, all HTTP requests are made and none of them to be flushed.
+        afterEach(function() {
+            $httpBackend.verifyNoOutstandingExpectation();
+            $httpBackend.verifyNoOutstandingRequest();
+        });
+
+        it('should make a get request to get a phone detail', function() {
+            // use $httpBackend service to respond a HTTP Get rquest to respond with some mock data
+            $httpBackend.when('GET', url).respond(200);
+            var phone = PhoneService.query();
+            expect(phone).toBeDefined();
+            $httpBackend.flush();
+        });
+
+        it('should make a update request', function() {
+            // verify data in $httpBackend request
+            $httpBackend.when('PUT', url, function(postdata) {
+                var data = angular.fromJson(postdata);
+                expect(data).toBeDefined();
+                expect(data.id).toBeGreaterThan(0);
+                return true;
+            }).respond(200);
+            PhoneService.update(null, {
+                id: 1
+            });
+            $httpBackend.flush();
+        });
+    });
+
 });
