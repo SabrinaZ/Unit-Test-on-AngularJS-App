@@ -35,7 +35,7 @@ describe('service', function() {
         it('should make a get request to get a phone detail', function() {
             // use $httpBackend service to respond a HTTP Get rquest to respond with some mock data
             $httpBackend.when('GET', url).respond(200);
-            var phone = PhoneService.query();
+            var phone = PhoneService.list();
             expect(phone).toBeDefined();
             $httpBackend.flush();
         });
@@ -48,7 +48,7 @@ describe('service', function() {
                 expect(data.id).toBeGreaterThan(0);
                 return true;
             }).respond(200);
-            PhoneService.update(null, {
+            PhoneService.update({
                 id: 1
             });
             $httpBackend.flush();
