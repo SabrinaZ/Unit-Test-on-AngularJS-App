@@ -35,8 +35,7 @@ describe('service', function() {
         it('should make a get request to get a phone detail', function() {
             // use $httpBackend service to respond a HTTP Get rquest to respond with some mock data
             $httpBackend.when('GET', url).respond(200);
-            var phone = PhoneService.query();
-            expect(phone).toBeDefined();
+            PhoneService.query();
             $httpBackend.flush();
         });
 

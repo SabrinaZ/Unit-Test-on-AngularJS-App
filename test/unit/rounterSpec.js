@@ -7,7 +7,6 @@ describe('router control', function() {
     beforeEach(inject(function($templateCache) {
         // enusure required html template is cached prior to each test case
         $templateCache.put('partials/phone-list.html', ' phone-list template');
-        $templateCache.put('partials/phone-detail.html', ' phone-detail template');
     }));
 
     it('phones should map to PhoneListCtrl ', inject(function($rootScope, $location, $route) {
