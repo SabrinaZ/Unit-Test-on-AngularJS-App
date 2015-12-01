@@ -139,4 +139,85 @@ describe('PhoneCat controllers', function() {
     });
 
 
+    describe('test PhoneDetailCtrl with mocks and spies', function() {
+        var scope, $q, ctrl,
+            xyzPhoneData = function() {
+                return {
+                    name: 'phone xyz',
+                    images: ['image/url1.png', 'image/url2.png']
+                };
+            };
+
+        var mockPhone = {};
+
+        beforeEach(function() {
+            module(function($provide) {
+                $provide.value('Phone', mockPhone);
+            });
+        });
+
+        beforeEach(inject(function(_$q_, $rootScope, $routeParams, $controller) {
+            $q = _$q_;
+            // in jasmine 0.3 or higher version, replace andCallFake with and.callFake
+            mockPhone.get = jasmine.createSpy('get').andCallFake(function() {
+                return $q.when(xyzPhoneData());
+            });
+            $routeParams.phoneId = 'xyz';
+            scope = $rootScope.$new();
+            ctrl = $controller('PhoneDetailCtrl', {
+                $scope: scope
+            });
+        }));
+
+
+        it('should fetch phone detail', function() {
+            expect(scope.phone).toBeUndefined();
+            scope.$apply();
+            expect(scope.phone).toEqualData(xyzPhoneData());
+            // expection on our spy
+            expect(mockPhone.get).toHaveBeenCalled();
+            // expect correct argument is passed into our spy method
+            expect(mockPhone.get).toHaveBeenCalledWith('xyz');
+        });
+    });
+
+
+    describe('test event on spies', function() {
+        var scope, $httpBackend, ctrl;
+
+        beforeEach(inject(function(_$httpBackend_, $rootScope, $routeParams, $controller) {
+            $httpBackend = _$httpBackend_;
+            $httpBackend.expectGET('phones/xyz.json').respond(404);
+
+            $routeParams.phoneId = 'xyz';
+            scope = $rootScope.$new();
+            ctrl = $controller('PhoneDetailCtrl', {
+                $scope: scope
+            });
+            spyOn(scope, '$broadcast');
+            $httpBackend.flush();
+        }));
+
+        afterEach(function() {
+            $httpBackend.verifyNoOutstandingExpectation();
+            $httpBackend.verifyNoOutstandingRequest();
+        });
+
+        it('should send a broadcast on not_found ', function() {
+            expect(scope.$broadcast).toHaveBeenCalled();
+            expect(scope.$broadcast.calls[0].args[0]).toBe('not_found');
+        });
+
+
+        it('should call redirect on timeout dispatch', inject(function($rootScope, $location) {
+            $rootScope.$broadcast('timeout', true);
+            expect($location.url()).toBeFalsy();
+        }));
+
+        it('should redirect to /phones on timeout dispatch and retry is false', inject(function($rootScope, $location) {
+            $rootScope.$broadcast('timeout', false);
+            expect($location.url()).toBe('/phones');
+        }));
+    });
+
 });
