@@ -23,3 +23,15 @@ phonecatServices.factory('Phone', ['$resource',
         });
     }
 ]);
+
+
+phonecatServices.service('util', function() {
+    return {
+        isNumber: isNumber
+    };
+
+    function isNumber(num) {
+        return !isNaN(num);
+    }
+
+});
