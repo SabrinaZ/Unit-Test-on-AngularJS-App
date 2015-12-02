@@ -25,7 +25,6 @@ describe('service', function() {
         }));
 
         // Test http get request using $httpBackend
-
         describe('Test http get request using $httpBackend', function() {
             var PhoneService, $httpBackend;
             var url;
@@ -34,7 +33,6 @@ describe('service', function() {
                 $httpBackend = _$httpBackend_;
                 PhoneService = _Phone_;
                 url = 'phones/phones.json';
-
             }));
 
             //verify that after all test suites are excuted, all HTTP requests are made and none of them to be flushed.
@@ -46,7 +44,7 @@ describe('service', function() {
             it('should make a get request to get a phone detail', function() {
                 // use $httpBackend service to respond a HTTP Get rquest to respond with some mock data
                 $httpBackend.when('GET', url).respond(200);
-                PhoneService.query();
+                PhoneService.list();
                 $httpBackend.flush();
             });
 
@@ -58,13 +56,13 @@ describe('service', function() {
                     expect(data.id).toBeGreaterThan(0);
                     return true;
                 }).respond(200);
-                PhoneService.update(null, {
+                PhoneService.update({
                     id: 1
                 });
                 $httpBackend.flush();
             });
+
         });
 
     });
-
 });
